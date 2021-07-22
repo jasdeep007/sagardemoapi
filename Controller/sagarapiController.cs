@@ -15,10 +15,10 @@ namespace sagardemoapi.Controller
         private readonly IEmployee _emp;
         private readonly IEmployee _emp1;
 
-        public sagarapiController(IEmployee emp)
+        public sagarapiController(IEmployee emp,IEmployee emp1)
         {
             this._emp = emp; // injected here
-            this._emp1 = emp;
+            this._emp1 = emp1;
         }
 
         [HttpGet]
@@ -37,7 +37,7 @@ namespace sagardemoapi.Controller
         public List<Employee> getAllEmployees()
         {
             List<Employee> employee = new List<Employee>();
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 1; i++)
             {
                 employee.AddRange(_emp.getEmployees());
                 employee.AddRange(_emp1.getEmployees());

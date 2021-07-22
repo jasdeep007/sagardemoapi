@@ -7,12 +7,8 @@ namespace sagardemoapi.models
 {
     public class Employee
     {
-       
+        public Guid id { get; set; }
         public string name { get; set; }
         public int age { get; set; }
-    }
-    public class newEmployee: Employee
-    {
-        public Guid id { get; set; }
     }
 }
