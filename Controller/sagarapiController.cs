@@ -44,6 +44,13 @@ namespace sagardemoapi.Controller
             }
             return employee;
         }
+        //[HttpGet]
+        //public async Task<List<Employee>> gettaskemployee()
+        //{
+        //    var r1 = Task.Run(() => _emp.getEmployees());
+        //    await Task.WhenAll(r1);
+        //    return r1.Result;
+        //}
 
         [HttpGet]
         public Guid getid()
