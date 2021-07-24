@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using sagardemoapi.filters;
 using sagardemoapi.models;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,14 @@ namespace sagardemoapi.Controller
         private readonly IEmployee _emp;
         private readonly IEmployee _emp1;
 
-        public sagarapiController(IEmployee emp,IEmployee emp1)
+        public sagarapiController(IEmployee emp, IEmployee emp1)
         {
             this._emp = emp; // injected here
             this._emp1 = emp1;
         }
 
         [HttpGet]
+        
         public string myfirstapi()
         {
             return "I am the output of very first api";
@@ -34,6 +36,8 @@ namespace sagardemoapi.Controller
         }
 
         [HttpGet]
+        [ActionName("getAllEmployees")]
+        [tokenverify]
         public List<Employee> getAllEmployees()
         {
             List<Employee> employee = new List<Employee>();
@@ -44,13 +48,52 @@ namespace sagardemoapi.Controller
             }
             return employee;
         }
-        //[HttpGet]
-        //public async Task<List<Employee>> gettaskemployee()
-        //{
-        //    var r1 = Task.Run(() => _emp.getEmployees());
-        //    await Task.WhenAll(r1);
-        //    return r1.Result;
-        //}
+        [HttpGet]
+      
+        public async Task<List<Employee>> gettaskemployee()
+        {
+            var r1 = Task.Run(() => _emp.getEmployees());
+            await Task.WhenAll(r1);
+            return r1.Result;
+        }
+
+        [HttpGet]
+        public async Task<object> apicall()
+        {
+            var st = DateTime.Now.ToString();
+            var r1 = Task.Run(()=> methodA());
+            var r2 = Task.Run(()=> methodB());
+            var r3 = Task.Run(()=> methodC());
+            var et = DateTime.Now.ToString();
+            await Task.WhenAll(r1, r2, r3);
+            return new
+            {
+                st = st,
+                r1 = r1.Result,
+                r2 = r2.Result,
+                r3 = r3.Result,
+                et = et
+            };
+        }
+
+        [NonAction]
+        public string methodA()
+        {
+            System.Threading.Thread.Sleep(3000);
+            return "method A";
+        }
+        [NonAction]
+        public string methodB()
+        {
+            System.Threading.Thread.Sleep(3000);
+            return "method B";
+        }
+        [NonAction]
+        public string methodC()
+        {
+            System.Threading.Thread.Sleep(3000);
+            return "method C";
+        }
 
         [HttpGet]
         public Guid getid()

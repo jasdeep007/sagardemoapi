@@ -25,7 +25,7 @@ namespace sagardemoapi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
-            services.AddTransient<IEmployee, EmployeeRepositoryFromDB>();
+            services.AddSingleton<IEmployee, EmployeeRepositoryFromDB>();
             services.AddMvc(options => options.EnableEndpointRouting = false);
         }
 
