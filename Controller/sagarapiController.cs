@@ -15,15 +15,27 @@ namespace sagardemoapi.Controller
     {
         private readonly IEmployee _emp;
         private readonly IEmployee _emp1;
+        private readonly IUsers _user;
 
-        public sagarapiController(IEmployee emp, IEmployee emp1)
+        public sagarapiController(IEmployee emp, IEmployee emp1, IUsers user)
         {
             this._emp = emp; // injected here
             this._emp1 = emp1;
+            this._user = user;
         }
 
+        [HttpPost]
+        [ActionName("createuser")]
+        public Task<int> createuser(User abc)
+        {
+            return this._user.AddUser(abc);
+        }
+
+
+
+
         [HttpGet]
-        
+
         public string myfirstapi()
         {
             return "I am the output of very first api";
@@ -36,8 +48,14 @@ namespace sagardemoapi.Controller
         }
 
         [HttpGet]
+        [ActionName("getusers")]
+        public List<User> getusers()
+        {
+            return this._user.getUsers();
+        }
+        [HttpGet]
         [ActionName("getAllEmployees")]
-        [tokenverify]
+        //[tokenverify]
         public List<Employee> getAllEmployees()
         {
             List<Employee> employee = new List<Employee>();
@@ -49,7 +67,6 @@ namespace sagardemoapi.Controller
             return employee;
         }
         [HttpGet]
-      
         public async Task<List<Employee>> gettaskemployee()
         {
             var r1 = Task.Run(() => _emp.getEmployees());
@@ -61,9 +78,9 @@ namespace sagardemoapi.Controller
         public async Task<object> apicall()
         {
             var st = DateTime.Now.ToString();
-            var r1 = Task.Run(()=> methodA());
-            var r2 = Task.Run(()=> methodB());
-            var r3 = Task.Run(()=> methodC());
+            var r1 = Task.Run(() => methodA());
+            var r2 = Task.Run(() => methodB());
+            var r3 = Task.Run(() => methodC());
             var et = DateTime.Now.ToString();
             await Task.WhenAll(r1, r2, r3);
             return new

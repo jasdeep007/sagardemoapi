@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using sagardemoapi.db;
 using sagardemoapi.models;
 using System;
 using System.Collections.Generic;
@@ -24,7 +26,20 @@ namespace sagardemoapi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //https://docs.microsoft.com/en-us/dotnet/csharp/linq/perform-inner-joins
+
+            // dotnet tool install --global dotnet-ef
+            // dotnet ef migration add "migrationname"
+            // dotnet ef database update    
+            services.AddDbContextPool<DbAccess>(
+                options => options.UseSqlServer(Configuration.GetConnectionString("dbcon"))
+                ); // scoped
+
+
             services.AddRazorPages();
+
+            services.AddScoped<IUsers, usersRepository>(); // singleton
+
             services.AddSingleton<IEmployee, EmployeeRepositoryFromDB>();
             services.AddMvc(options => options.EnableEndpointRouting = false);
         }
@@ -62,12 +77,13 @@ namespace sagardemoapi
             }
 
             app.UseStaticFiles(); // static
-            
+
             app.UseRouting();
 
             //app.UseAuthorization();
+            
 
-         
+
             app.UseMvcWithDefaultRoute();
 
             //short circuiting
@@ -79,7 +95,7 @@ namespace sagardemoapi
                     );
             });
             // run middleware
-            app.Use(async (context,next) =>
+            app.Use(async (context, next) =>
             {
                 await context.Response.WriteAsync("I am coming from request 1\n");
                 await next.Invoke();
@@ -100,7 +116,8 @@ namespace sagardemoapi
 
             app.Map("/somerouting", executethiscode1);
 
-            app.MapWhen(context => {
+            app.MapWhen(context =>
+            {
                 return context.Request.Query.ContainsKey("somekey");
             }, executethiscode);
 
