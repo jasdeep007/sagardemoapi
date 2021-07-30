@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,12 +30,15 @@ namespace sagardemoapi
             //https://docs.microsoft.com/en-us/dotnet/csharp/linq/perform-inner-joins
 
             // dotnet tool install --global dotnet-ef
-            // dotnet ef migration add "migrationname"
+            // dotnet ef migrations add "migrationname"
             // dotnet ef database update    
             services.AddDbContextPool<DbAccess>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("dbcon"))
                 ); // scoped
 
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<DbAccess>();
 
             services.AddRazorPages();
 
@@ -81,8 +85,9 @@ namespace sagardemoapi
             app.UseRouting();
 
             //app.UseAuthorization();
-            
 
+
+            app.UseAuthentication();
 
             app.UseMvcWithDefaultRoute();
 

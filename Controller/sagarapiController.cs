@@ -1,14 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using sagardemoapi.filters;
 using sagardemoapi.models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace sagardemoapi.Controller
 {
+
+
     [Route("api/[controller]/[Action]")]
     [ApiController]
     public class sagarapiController : ControllerBase
@@ -17,11 +22,19 @@ namespace sagardemoapi.Controller
         private readonly IEmployee _emp1;
         private readonly IUsers _user;
 
-        public sagarapiController(IEmployee emp, IEmployee emp1, IUsers user)
+        private readonly UserManager<IdentityUser> _usermanager;
+        private readonly SignInManager<IdentityUser> _signinmanager;
+
+        public sagarapiController(IEmployee emp, IEmployee emp1, IUsers user,
+                UserManager<IdentityUser> usermanager,
+                SignInManager<IdentityUser> signinmanager
+            )
         {
             this._emp = emp; // injected here
             this._emp1 = emp1;
             this._user = user;
+            this._usermanager = usermanager;
+            this._signinmanager = signinmanager;
         }
 
         [HttpPost]
@@ -31,11 +44,36 @@ namespace sagardemoapi.Controller
             return this._user.AddUser(abc);
         }
 
+        [HttpPost]
+        [ActionName("loginuser")]
+        public async Task<OkObjectResult> loginuser(User abc)
+        {
+            if (ModelState.IsValid)
+            {
+                var r_user = new IdentityUser { UserName = abc.name, Email = abc.name };
+                var result = await _usermanager.CreateAsync(r_user, "S@gar123#123");                
 
+                if (result.Succeeded)
+                {
+                    // await _signinmanager.SignInAsync(r_user, isPersistent: false);
+                    //return 1;
+                    return Ok(new { result = 1, data = abc });
+                }
+                else
+                {
+                    List<string> error = new List<string>();
+                    foreach (var errors in result.Errors)
+                    {
+                        error.Add(errors.Description);
+                    }
+                    return Ok(new { result = 0, data = error });
+                }
+            }
+            return Ok(new { result = 0, data = 0 });
+        }
 
 
         [HttpGet]
-
         public string myfirstapi()
         {
             return "I am the output of very first api";
